@@ -7,6 +7,7 @@
 #include "Packet.h"
 #include <vector>
 #include <iostream>
+#include <string>
 
 class BidiMessegeEncoderDecoder {
 private:
@@ -21,9 +22,10 @@ public:
     virtual ~BidiMessegeEncoderDecoder();
     Packet* decodeNextByte(char nextChar); //maybe need other thing then char.
     void pushChar(char nextChar);
-    char* encode(Packet messege);
+    char* encode(char* messege);
     Packet decode(char* bytesArr);
     void setOpCode();
+    void setBytesOpcode(short num);
     void initDecode();
     short valueOfTwoCells(char* bytesArr, int first, int second);
     short bytesToShort(char* bytesArr);

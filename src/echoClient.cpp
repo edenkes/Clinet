@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "../include/connectionHandler.h"
+#include "../include/BidiMessegeEncoderDecoder.h"
 
 /**
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
@@ -18,15 +19,18 @@ int main (int argc, char *argv[]) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
-	
+	BidiMessegeEncoderDecoder* encdec = new BidiMessegeEncoderDecoder();
 	//From here we will see the rest of the ehco client implementation:
     while (1) {
         const short bufsize = 1024;
         char buf[bufsize];
-
+        std::cout << "waiting for user input\n" << std::endl;
         std::cin.getline(buf, bufsize);
+        char* readyToSend=encdec->encode(buf);
+        //now need to convert the user input to the format for the server (using encoderDevoder).
 		std::string line(buf);
 		int len=line.length();
+        std::cout << "length:\n" << len <<std::endl;
         if (!connectionHandler.sendLine(line)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
