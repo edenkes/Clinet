@@ -30,6 +30,7 @@ public:
     short valueOfTwoCells(char* bytesArr, int first, int second);
     short bytesToShort(char* bytesArr);
     void shortToBytes(short num, char* bytesArr);
+    char* concat(std::vector<char*> &arrays);
 
 
 

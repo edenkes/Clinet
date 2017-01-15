@@ -5,7 +5,9 @@
 /**
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
+/*
 int main (int argc, char *argv[]) {
+
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
         return -1;
@@ -28,7 +30,7 @@ int main (int argc, char *argv[]) {
         std::cin.getline(buf, bufsize);
         char* readyToSend=encdec->encode(buf);
         //now need to convert the user input to the format for the server (using encoderDevoder).
-		std::string line(buf);
+		std::string line(readyToSend);
 		int len=line.length();
         std::cout << "length:\n" << len <<std::endl;
         if (!connectionHandler.sendLine(line)) {
@@ -62,4 +64,5 @@ int main (int argc, char *argv[]) {
         }
     }
     return 0;
-}
+
+}*/
