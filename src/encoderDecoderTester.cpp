@@ -8,6 +8,7 @@
 /**
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
+/*
 int main () {
 
     BidiMessegeEncoderDecoder* encdec = new BidiMessegeEncoderDecoder();
@@ -16,7 +17,7 @@ int main () {
         char buf[bufsize];
         std::cout << "waiting for user input\n" << std::endl;
         std::cin.getline(buf, bufsize); //userinput
-        char* readyToSend=encdec->encode(buf);
+
         //now need to convert the user input to the format for the server (using encoderDevoder).
         for (int i=0;i<4;i++){
             std::cout << " " <<readyToSend[i]<< std::endl;
@@ -32,5 +33,6 @@ int main () {
 
         return (0);
 }
+ */
 
 
