@@ -147,9 +147,9 @@ void BidiMessegeEncoderDecoder::createMsgWithZero (short opcode, int fileSize ,c
     }
     std::cout<<std::endl;
     outputToServer[messegeSize-1]='0'; //zero in the end
-    for (int i=0;i<messegeSize;i++ ){
-        std::cout<<" "<<(short)outputToServer[i];
-    }
+    //for (int i=0;i<messegeSize;i++ ){
+    //    std::cout<<" "<<(short)outputToServer[i];
+    //}
     msgIsReady=true;
 
 }
@@ -159,6 +159,7 @@ void BidiMessegeEncoderDecoder::createSmallMsg (short opcode){
     outputToServer=new char[2];
     shortToBytes(opcode,outputToServer);
     msgIsReady=true;
+
 }
 int BidiMessegeEncoderDecoder::getMsgSize() {
     return messegeSize;
