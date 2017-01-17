@@ -13,7 +13,7 @@
 using boost::thread;
 using namespace std;
 
-/*
+
 int main (int argc, char *argv[]) {
 
     if (argc < 3) {
@@ -34,21 +34,18 @@ int main (int argc, char *argv[]) {
     keyboardInput keyboard(&connectionHandler,&encdec);
     serverInput serverListener(&connectionHandler,&encdec);
 
-    boost::mutex mutex;
-
-
-
 
     boost::thread th1(boost::bind(&keyboardInput::run,&keyboard));
-   // boost::thread th2(&serverInput::run,&serverListener);
+    boost::thread th2(boost::bind(&serverInput::run,&serverListener));
 
-   // th1.join();
-   // th2.join();
+    cout<<"established 2 threads"<<endl;
+    th1.join();
+    th2.join();
 
     cout<<"Client is closed"<<endl;
     return 0;
 }
- */
+
 
 
 

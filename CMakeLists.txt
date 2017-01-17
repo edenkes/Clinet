@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(Client)
 message(STATUS "start running cmake...")
-find_package(Boost 1.58.0 COMPONENTS system filesystem REQUIRED)
+find_package(Boost 1.57.0 COMPONENTS system filesystem thread REQUIRED)
 if(Boost_FOUND)
     message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
@@ -10,10 +10,6 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 
 endif()
-
-
-
-
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 

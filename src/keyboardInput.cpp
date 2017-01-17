@@ -8,6 +8,7 @@ keyboardInput::keyboardInput(ConnectionHandler *connectionHandler, BidiMessegeEn
         _ch(connectionHandler), _encdec(encdec) {}
 
 void keyboardInput::run() {
+    cout<<"started user input"<<endl;
     while (1) {
         char buf[bufsize];
         std::cout << "waiting for user input\n" << std::endl;

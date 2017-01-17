@@ -10,6 +10,7 @@ _ch(ch), _encdec(encdec){}
 
 
 void serverInput::run(){
+    cout<<"started serverListener"<<endl;
     while (1) {
         if (!_ch->getBytes(opcodeArr, 2)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
