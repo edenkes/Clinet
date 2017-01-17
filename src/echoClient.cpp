@@ -17,11 +17,12 @@ int main (int argc, char *argv[]) {
 
     std::cout << "Host: " << host << " Port:" <<port << std::endl;
     ConnectionHandler connectionHandler(host, port);
+    ConnectionHandler* _ch=&connectionHandler;
     if (!connectionHandler.connect()) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
-	BidiMessegeEncoderDecoder* encdec = new BidiMessegeEncoderDecoder();
+	BidiMessegeEncoderDecoder* encdec=new BidiMessegeEncoderDecoder(*_ch);
 	//From here we will see the rest of the ehco client implementation:
     while (1) {
         const short bufsize = 1024;
@@ -32,28 +33,32 @@ int main (int argc, char *argv[]) {
         char* msgToSend=encdec->getEncodedMsg();
         //now need to convert the user input to the format for the server (using encoderDevoder).
 		int len=encdec->getMsgSize();
-        std::cout << "length:\n" << len <<std::endl;
+       // std::cout << "length:\n" << len <<std::endl;
         if (!connectionHandler.sendBytes(msgToSend,len)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
         }
         // connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
-        std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
+        //std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
 
 
         // We can use one of three options to read data from the server:
         // 1. Read a fixed number of characters
         // 2. Read a line (up to the newline character using the getline() buffered reader
         // 3. Read up to the null character
-        char* messegeFromServer=new char[4];
+
+        char opcodeArr[2];
         // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
         // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
-        if (!connectionHandler.getBytes(messegeFromServer,bufsize)) {
+        if (!connectionHandler.getBytes(opcodeArr,2))  {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
         }
-        string recieved=string(messegeFromServer);
-        cout<<"msg from server:"<<recieved<<endl;
+        short opc=(encdec->bytesToShort(opcodeArr));
+        cout<<"opcode from server:"<<opc<<endl;
+        //need to handle BCAST, DATA, DISC, ACK.
+        encdec->decode(opc);
+
 
         //len=answer.length();
         // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket

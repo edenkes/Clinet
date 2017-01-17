@@ -4,7 +4,7 @@
 
 
 
-BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder() {
+BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler& ch): _chandler(ch) {
 
     cout<<"BidiEncoderDecoder constructor"<< std::endl;
     opcodeInBytes=new char[2];
@@ -12,6 +12,10 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder() {
     dataFromUser.reserve(1024);
     fromServerDataLength=0;
     fromUserDatalength=0;
+    bool waitingForData=false;
+    bool waitingForDir=false;
+    bool waitingForAck=false;
+    typeOfLastPacket=-1; //put false value
 
 }
 
@@ -84,7 +88,7 @@ void BidiMessegeEncoderDecoder::encode(char* messege) {
     }
     else if (userInput.find("DIRQ") != std::string::npos) {
         std::cout << "found DIRQ!" << '\n';
-        createSmallMsg(10);
+        createSmallMsg(6);
     }
     else if (userInput.find("LOGRQ") != std::string::npos) {
         std::cout << "found LOGRQ!" << '\n';
@@ -166,6 +170,84 @@ void BidiMessegeEncoderDecoder::decode(char *bytesArr) {
 
 
 }
+/**
+ * this function gets the opcode msg of the given msg from the server and decide how to handle it.
+ * need to take care for data,ack,bcast and disc packets.
+ * @param msgOpcode
+ */
+void BidiMessegeEncoderDecoder::decode(short msgOpcode){
+    cout<<"function: decoder, decode packet type #"<<msgOpcode<<endl;
+    if (msgOpcode==3)
+        decodeDATA();
+    else if (msgOpcode==4){
+        short block=getShort();
+        cout<<"ACK "<<block<<endl;
+    }
+    else if (msgOpcode==5)
+        decodeERROR();
+    else if (msgOpcode==9)
+        decodeBCAST();
+    else
+        cout<<"problem, didnt find any option for this opcode"<<endl;
+
+}
+void BidiMessegeEncoderDecoder::decodeDATA(){
+    int counter=0;
+    char singleByte[1];
+    short packetSize=getShort();
+    short blockNum=getShort();
+    if (packetSize>0) {
+        while (_chandler.getBytes(singleByte, 1) && counter < packetSize) {
+            dataFromServer.push_back(singleByte[0]);
+            counter++;
+        }
+    }
+    cout<< "DATA block number:"<<blockNum <<" packet size:"<<packetSize<<endl;
+
+}
+void BidiMessegeEncoderDecoder::decodeERROR() {
+    char singleByte[1];
+    int counter = 0;
+    short error=getShort();
+    while (_chandler.getBytes(singleByte, 1)&& singleByte[0]!='0') {
+        dataFromServer.push_back(singleByte[0]);
+        counter++;
+    }
+
+    string errormsg="";
+    for (int i = 0; i < counter; i++) {
+        errormsg+=dataFromServer[i];
+    }
+    cout<<"ERROR "<<error<<" Error messege:"<<errormsg<<endl;
+}
+
+void BidiMessegeEncoderDecoder::decodeBCAST(){
+    string addStatus="waiting for info";
+    int counter = 0;
+    char singleByte[1];
+    _chandler.getBytes(singleByte,1);
+    if (singleByte[0]==1)
+        addStatus="add";
+    else if (singleByte[0]==0)
+        addStatus="del";
+    while (_chandler.getBytes(singleByte, 1)&& singleByte[0]!='0') {
+        dataFromServer.push_back(singleByte[0]);
+        counter++;
+    }
+    string fileName[counter];
+    for (int i = 0; i < counter; i++) {
+        fileName[i]=dataFromServer[i];
+    }
+    cout<<"BCAST "<<addStatus<<" "<<fileName<<endl;
+}
+/**
+ * this is ont of the main indicators for the handle function.
+ * @param opcodeSent
+ */
+void BidiMessegeEncoderDecoder::uptadeLastSentPacket(short opcodeSent){
+    typeOfLastPacket=opcodeSent;
+}
+
 void BidiMessegeEncoderDecoder::setOpCode() {
 
 }
@@ -181,6 +263,18 @@ void BidiMessegeEncoderDecoder::initDecode() {
     messegeSize=0;
 }
 
+/**
+ * this is the proccess function.
+ * using theese varibles in order to hold the states:
+ *  bool waitingForData;
+    bool waitingForDir;
+    bool waitingForAck;
+    short typeOfLastPacket;
+ */
+void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
+    //TODO:need to implement.
+}
+
 short BidiMessegeEncoderDecoder::valueOfTwoCells(char *bytesArr, int first, int second) {
     short result = (short)((bytesArr[first] & 0xff) << 8);
     result += (short)(bytesArr[second] & 0xff);
@@ -188,6 +282,12 @@ short BidiMessegeEncoderDecoder::valueOfTwoCells(char *bytesArr, int first, int 
 }
 
 
+short BidiMessegeEncoderDecoder::getShort(){
+    char numInBytes[2];
+    _chandler.getBytes(numInBytes,2);
+    short error=0;
+    return(bytesToShort(numInBytes));
+}
 
 
 short BidiMessegeEncoderDecoder::bytesToShort(char* bytesArr)

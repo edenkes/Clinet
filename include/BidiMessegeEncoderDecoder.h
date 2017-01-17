@@ -4,7 +4,7 @@
 
 #ifndef BOOST_ECHO_CLIENT_BIDIMESSEGEENCODERDECODER_H
 #define BOOST_ECHO_CLIENT_BIDIMESSEGEENCODERDECODER_H
-#include "Packet.h"
+#include "connectionHandler.h"
 #include <vector>
 #include <iostream>
 #include <string>
@@ -22,12 +22,18 @@ private:
     string filenameFromUser;
     string fileNameFromServer;
     //    ofstream _outputStream;
-    bool zeroInTheEnd;
     bool msgIsReady;
     short opcode;
     char* opcodeInBytes;
+    ConnectionHandler& _chandler;
+    bool waitingForData;
+    bool waitingForDir;
+    bool waitingForAck;
+    short typeOfLastPacket;
+
+
 public:
-    BidiMessegeEncoderDecoder();
+    BidiMessegeEncoderDecoder(ConnectionHandler& ch);
     virtual ~BidiMessegeEncoderDecoder();
     vector<char>* decodeNextByte(char nextChar); //maybe need other thing then char.
     void pushCharFromServer(char nextChar);
@@ -37,10 +43,17 @@ public:
     void createSmallMsg (short opcode);
     int getMsgSize();
     void decode(char* bytesArr);
+    void decode(short msgOpcode);
+    void decodeDATA();
+    void decodeERROR();
+    void decodeBCAST();
+    void uptadeLastSentPacket(short opcodeSent);
     void setOpCode();
     void setBytesOpcode(short num);
     void initDecode();
+    void proccess(short currentOpcode);
     short valueOfTwoCells(char* bytesArr, int first, int second);
+    short getShort();
     short bytesToShort(char* bytesArr);
     void shortToBytes(short num, char* bytesArr);
     char* concat(std::vector<char*> &arrays);
