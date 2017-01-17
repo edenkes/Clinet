@@ -22,7 +22,7 @@ int main (int argc, char *argv[]) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
-	BidiMessegeEncoderDecoder* encdec=new BidiMessegeEncoderDecoder(*_ch);
+	BidiMessegeEncoderDecoder* encdec = new BidiMessegeEncoderDecoder(_ch);
 	//From here we will see the rest of the ehco client implementation:
     while (1) {
         const short bufsize = 1024;
@@ -64,14 +64,15 @@ int main (int argc, char *argv[]) {
         // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
         // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
         //answer.resize(len-1);
-        /*
-        std::cout << "Reply: " << answer << " " << len << " bytes " << std::endl << std::endl;
-        if (answer == "bye") {
-            std::cout << "Exiting...\n" << std::endl;
-            break;
-        }
-         */
+
+//        std::cout << "Reply: " << answer << " " << len << " bytes " << std::endl << std::endl;
+//        if (answer == "bye") {
+//            std::cout << "Exiting...\n" << std::endl;
+//            break;
+//        }
+
     }
     return 0;
 
 }
+

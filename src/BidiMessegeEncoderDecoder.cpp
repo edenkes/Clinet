@@ -4,7 +4,7 @@
 
 
 
-BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler& ch): _chandler(ch) {
+BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _chandler(ch) {
 
     cout<<"BidiEncoderDecoder constructor"<< std::endl;
     opcodeInBytes=new char[2];
@@ -198,7 +198,7 @@ void BidiMessegeEncoderDecoder::decodeDATA(){
     short packetSize=getShort();
     short blockNum=getShort();
     if (packetSize>0) {
-        while (_chandler.getBytes(singleByte, 1) && counter < packetSize) {
+        while (_chandler->getBytes(singleByte, 1) && counter < packetSize) {
             dataFromServer.push_back(singleByte[0]);
             counter++;
         }
@@ -210,7 +210,7 @@ void BidiMessegeEncoderDecoder::decodeERROR() {
     char singleByte[1];
     int counter = 0;
     short error=getShort();
-    while (_chandler.getBytes(singleByte, 1)&& singleByte[0]!='0') {
+    while (_chandler->getBytes(singleByte, 1)&& singleByte[0]!='0') {
         dataFromServer.push_back(singleByte[0]);
         counter++;
     }
@@ -226,12 +226,12 @@ void BidiMessegeEncoderDecoder::decodeBCAST(){
     string addStatus="waiting for info";
     int counter = 0;
     char singleByte[1];
-    _chandler.getBytes(singleByte,1);
+    _chandler->getBytes(singleByte,1);
     if (singleByte[0]==1)
         addStatus="add";
     else if (singleByte[0]==0)
         addStatus="del";
-    while (_chandler.getBytes(singleByte, 1)&& singleByte[0]!='0') {
+    while (_chandler->getBytes(singleByte, 1)&& singleByte[0]!='0') {
         dataFromServer.push_back(singleByte[0]);
         counter++;
     }
@@ -285,7 +285,7 @@ short BidiMessegeEncoderDecoder::valueOfTwoCells(char *bytesArr, int first, int 
 
 short BidiMessegeEncoderDecoder::getShort(){
     char numInBytes[2];
-    _chandler.getBytes(numInBytes,2);
+    _chandler->getBytes(numInBytes,2);
     short error=0;
     return(bytesToShort(numInBytes));
 }
