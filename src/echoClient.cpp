@@ -9,7 +9,7 @@
 int main (int argc, char *argv[]) {
 
     if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
+        std::cerr << "Usage: " << argv[0] << "192.168.2.112" << std::endl << std::endl;
         return -1;
     }
     std::string host = argv[1];

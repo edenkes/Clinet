@@ -12,10 +12,11 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler& ch): _ch
     dataFromUser.reserve(1024);
     fromServerDataLength=0;
     fromUserDatalength=0;
-    bool waitingForData=false;
-    bool waitingForDir=false;
-    bool waitingForAck=false;
+    bool iswaitingForData=false;
+    bool iswaitingForDir=false;
+    bool iswaitingForAck=false;
     typeOfLastPacket=-1; //put false value
+
 
 }
 
@@ -25,7 +26,6 @@ BidiMessegeEncoderDecoder::~BidiMessegeEncoderDecoder() {
 
 
 vector<char>* BidiMessegeEncoderDecoder::decodeNextByte(char nextChar) {
-    //TODO:need to implement
     return (&dataFromServer) ;
 }
 
@@ -273,6 +273,45 @@ void BidiMessegeEncoderDecoder::initDecode() {
     short typeOfLastPacket;
  */
 void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (currentOpcode == 3){    //Data
+
+    }else if(currentOpcode == 4){   //Acknowledgment
+
+    }else if(currentOpcode == 5){   //Error
+        if()
+    }else{  //Broadcast
+        //Do noting
+    }
     //TODO:need to implement.
 }
 

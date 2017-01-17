@@ -26,10 +26,12 @@ private:
     short opcode;
     char* opcodeInBytes;
     ConnectionHandler& _chandler;
-    bool waitingForData;
-    bool waitingForDir;
-    bool waitingForAck;
+    bool iswaitingForData;
+    bool iswaitingForDir;
+    bool iswaitingForAck;
     short typeOfLastPacket;
+
+    //Const
 
 
 public:
