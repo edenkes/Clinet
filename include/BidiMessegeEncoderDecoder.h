@@ -8,6 +8,8 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <fstream>
+
 using namespace std;
 class BidiMessegeEncoderDecoder {
 private:
@@ -26,10 +28,17 @@ private:
     short opcode;
     char* opcodeInBytes;
     ConnectionHandler& _chandler;
+    bool isSendingData;
+    bool isRecevingData;
     bool iswaitingForData;
     bool iswaitingForDir;
     bool iswaitingForAck;
     short typeOfLastPacket;
+//    vector data;
+    string fileName;
+    ofstream outputFile;
+    bool iswaitingForDisc;
+    bool isItFirstPacket;
 
     //Const
 
@@ -59,8 +68,12 @@ public:
     short bytesToShort(char* bytesArr);
     void shortToBytes(short num, char* bytesArr);
     char* concat(std::vector<char*> &arrays);
+    void createDataPacket (short blockNum, short packetSize, string* _s);
 
-/*
+
+
+
+    /*
  * using namespace std;
 class EncodeDecode {
 private:
@@ -92,6 +105,9 @@ public:
 
 
  */
+
+    void crateFile();
+
 
 };
 

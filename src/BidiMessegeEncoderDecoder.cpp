@@ -1,4 +1,6 @@
+#include <list>
 #include "../include/BidiMessegeEncoderDecoder.h"
+#include <fstream>
 // Created by rotem on 07/01/17.
 //
 
@@ -12,11 +14,16 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler& ch): _ch
     dataFromUser.reserve(1024);
     fromServerDataLength=0;
     fromUserDatalength=0;
-    bool iswaitingForData=false;
-    bool iswaitingForDir=false;
-    bool iswaitingForAck=false;
+    isSendingData=false;
+    isRecevingData=false;
+    iswaitingForData=false;
+    iswaitingForDir=false;
+    iswaitingForAck=false;
+    iswaitingForDisc = false;
+    isItFirstPacket = true;
     typeOfLastPacket=-1; //put false value
-
+//    data = new vector;
+    fileName = "";
 
 }
 
@@ -50,55 +57,59 @@ void BidiMessegeEncoderDecoder::encode(char* messege) {
     int counter;
     std::string command(userInput.substr(0,userInput.find(" ")));
     unsigned int spaceIndex=userInput.find(" ");
-    cout <<"user input is:"<<userInput<< std::endl;
-    cout <<"command is:"<<command<< std::endl;
+//    cout <<"user input is:"<<userInput<< std::endl;
+//    cout <<"command is:"<<command<< std::endl;
 
     if (userInput.find("RRQ") != std::string::npos) {
-        std::cout << "found RRQ!" << '\n';
+//        std::cout << "found RRQ!" << '\n';
         msgOpcode=1;
         //setBytesOpcode(msgOpcode); //opcodeInBytes is set.
-        string fileName=(userInput.substr(spaceIndex+1));
+        fileName=(userInput.substr(spaceIndex+1));
+        isRecevingData = true;
+        isItFirstPacket = true;
         createMsgWithZero(msgOpcode,fileName.size(),messege);
 
     }
     else if (userInput.find("WRQ") != std::string::npos) {
-        std::cout << "found WRQ!" << '\n';
+//        std::cout << "found WRQ!" << '\n';
         msgOpcode=2;
         //setBytesOpcode(msgOpcode); //opcodeInBytes is set.
-        string fileName=(userInput.substr(spaceIndex+1));
+        fileName=(userInput.substr(spaceIndex+1));
+        isSendingData = true;
         createMsgWithZero(msgOpcode,fileName.size(),messege);
     }
     else if (userInput.find("DATA") != std::string::npos) {
-        std::cout << "found DATA, will creat a bad packet!" << '\n';
+//        std::cout << "found DATA, will creat a bad packet!" << '\n';
         //no need to handle it.
         createSmallMsg(11);
 
     }
     else if (userInput.find("ACK") != std::string::npos) {
-        std::cout << "found ACK!, will creat a bad packet" << '\n';
+//        std::cout << "found ACK!, will creat a bad packet" << '\n';
         //no need to handle it.
         createSmallMsg(11);
 
 
     }
     else if (userInput.find("Error") != std::string::npos) {
-        std::cout << "found Error!" << '\n';
-        //need to handle
-
+//        std::cout << "found Error!" << '\n';
+        isRecevingData = false;
+        isSendingData = false;
+        createSmallMsg(11);
     }
     else if (userInput.find("DIRQ") != std::string::npos) {
-        std::cout << "found DIRQ!" << '\n';
+//        std::cout << "found DIRQ!" << '\n';
         createSmallMsg(6);
     }
     else if (userInput.find("LOGRQ") != std::string::npos) {
-        std::cout << "found LOGRQ!" << '\n';
+//        std::cout << "found LOGRQ!" << '\n';
         msgOpcode=7;
         //setBytesOpcode(msgOpcode); //opcodeInBytes is set.
         string fileName=(userInput.substr(spaceIndex+1));
         createMsgWithZero(msgOpcode,fileName.size(),messege);
     }
     else if (userInput.find("DELRQ") != std::string::npos) {
-        std::cout << "found DELRQ!" << '\n';
+//        std::cout << "found DELRQ!" << '\n';
         msgOpcode=8;
         //setBytesOpcode(msgOpcode); //opcodeInBytes is set.
         string fileName=(userInput.substr(spaceIndex+1));
@@ -106,17 +117,18 @@ void BidiMessegeEncoderDecoder::encode(char* messege) {
 
     }
     else  if (userInput.find("BCAST") != std::string::npos) {
-        std::cout << "found BCAST!, will creat a bad packet" << '\n';
+//        std::cout << "found BCAST!, will creat a bad packet" << '\n';
         createSmallMsg(11);
 
     }
     else  if (userInput.find("DISC") != std::string::npos) {
-        std::cout << "found DISC!" << '\n';
+//        std::cout << "found DISC!" << '\n';
+        iswaitingForDisc = true;
         createSmallMsg(10);
 
     }
     else {
-        std::cout << "need to create BAD packet" << '\n';
+//        std::cout << "need to create BAD packet" << '\n';
         createSmallMsg(11);
     }
 
@@ -124,7 +136,7 @@ void BidiMessegeEncoderDecoder::encode(char* messege) {
 
     //std::cout<< (userInput.find("LOGRQ"));
 
-    std::cout<<"finished encode, ans size:"<<std::endl;
+//    std::cout<<"finished encode, ans size:"<<std::endl;
 
 
 
@@ -145,7 +157,7 @@ void BidiMessegeEncoderDecoder::createMsgWithZero (short opcode, int fileSize ,c
     for (int i=0;i<fileSize;i++ ){
         outputToServer[i+2]=fileName.at(i);
     }
-    std::cout<<std::endl;
+//    std::cout<<std::endl;
     outputToServer[messegeSize-1]='0'; //zero in the end
     //for (int i=0;i<messegeSize;i++ ){
     //    std::cout<<" "<<(short)outputToServer[i];
@@ -166,6 +178,7 @@ int BidiMessegeEncoderDecoder::getMsgSize() {
 }
 
 
+
 void BidiMessegeEncoderDecoder::decode(char *bytesArr) {
 
 
@@ -177,12 +190,12 @@ void BidiMessegeEncoderDecoder::decode(char *bytesArr) {
  * @param msgOpcode
  */
 void BidiMessegeEncoderDecoder::decode(short msgOpcode){
-    cout<<"function: decoder, decode packet type #"<<msgOpcode<<endl;
+//    cout<<"function: decoder, decode packet type #"<<msgOpcode<<endl;
     if (msgOpcode==3)
         decodeDATA();
     else if (msgOpcode==4){
         short block=getShort();
-        cout<<"ACK "<<block<<endl;
+//        cout<<"ACK "<<block<<endl;
     }
     else if (msgOpcode==5)
         decodeERROR();
@@ -203,7 +216,7 @@ void BidiMessegeEncoderDecoder::decodeDATA(){
             counter++;
         }
     }
-    cout<< "DATA block number:"<<blockNum <<" packet size:"<<packetSize<<endl;
+//    cout<< "DATA block number:"<<blockNum <<" packet size:"<<packetSize<<endl;
 
 }
 void BidiMessegeEncoderDecoder::decodeERROR() {
@@ -219,7 +232,7 @@ void BidiMessegeEncoderDecoder::decodeERROR() {
     for (int i = 0; i < counter; i++) {
         errormsg+=dataFromServer[i];
     }
-    cout<<"ERROR "<<error<<" Error messege:"<<errormsg<<endl;
+//    cout<<"ERROR "<<error<<" Error messege:"<<errormsg<<endl;
 }
 
 void BidiMessegeEncoderDecoder::decodeBCAST(){
@@ -239,7 +252,7 @@ void BidiMessegeEncoderDecoder::decodeBCAST(){
     for (int i = 0; i < counter; i++) {
         fileName[i]=dataFromServer[i];
     }
-    cout<<"BCAST "<<addStatus<<" "<<fileName<<endl;
+//    cout<<"BCAST "<<addStatus<<" "<<fileName<<endl;
 }
 /**
  * this is ont of the main indicators for the handle function.
@@ -304,11 +317,84 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
 
 
     if (currentOpcode == 3){    //Data
+        if(iswaitingForDir){
+            string fileNames = "";
+            iswaitingForDir = false;
+            for (int i = 0; i < dataFromServer.size(); ++i) {
+                if(dataFromServer.at(i) != 0){
+                    fileNames += dataFromServer.at(i);
+                }else{
+//                    cout << fileNames << std::endl;
+                    fileNames = "";
+                }
+            }
+        }
+        else if (isRecevingData){
+            if(isItFirstPacket){
+                isItFirstPacket = false;
+                outputFile.open(fileName);
+
+            }
+
+            for (int i = 0; i < dataFromServer.size(); ++i) {
+                outputFile << dataFromServer.at(i);
+            }
+            if(dataFromServer.size() < 512){
+                outputFile.close();
+//                cout<< "RRQ " << fileName << " complete" << endl;
+            }
+
+
+        }else{
+//            cout<< "Problem with process the data" << endl;
+
+        }
 
     }else if(currentOpcode == 4){   //Acknowledgment
+        if(iswaitingForDisc){
+            //TODO
+        }
+//        ifstream fileBuffer;
+        else  if(isSendingData){
+            if(isItFirstPacket) {
+                isItFirstPacket = false;
+                ifstream fileBuffer(fileName, ios::in|ios::binary);
+
+                outputFile.open(fileName);
+            }
+                /* fileBuffer.seekg (0, ios::end);
+                 int length = fileBuffer.tellg();
+                 fileBuffer.seekg (0, ios::beg);
+                 fileBuffer = new char [length];
+                 input.read (buffer,length);*/
+
+                /*string line;
+                ifstream myfile ("example.txt");
+                if (myfile.is_open())
+                {
+                    while ( getline (myfile,line) )
+                    {
+                        cout << line << '\n';
+                    }
+
+                    myfile.close();
+                }
+        */
+            else cout << "Unable to open file";
+        }
+
+
 
     }else if(currentOpcode == 5){   //Error
-        if()
+        if(iswaitingForDisc){
+            createSmallMsg(10);
+        }
+        iswaitingForDisc = false;
+        isSendingData = false;
+        isRecevingData = false;
+//        iswaitingForAck = false;
+//        iswaitingForData = false;
+        iswaitingForDir = false;
     }else{  //Broadcast
         //Do noting
     }
@@ -345,7 +431,29 @@ char* BidiMessegeEncoderDecoder::concat(std::vector<char*> &arrays)
 {
 
 }
+//info is
+void BidiMessegeEncoderDecoder::createDataPacket (short blockNum, short packetSize, string* _s){
+    messegeSize=6+packetSize;
+    outputToServer=new char[messegeSize];
+    char encodedBytes[2];
+
+    short opc=3;
+    shortToBytes(opc,encodedBytes);
+    outputToServer[0]=encodedBytes[0];
+    outputToServer[1]=encodedBytes[1];
+    shortToBytes(packetSize,encodedBytes);
+    outputToServer[2]=encodedBytes[0];
+    outputToServer[3]=encodedBytes[1];
+    shortToBytes(blockNum,encodedBytes);
+    outputToServer[4]=encodedBytes[0];
+    outputToServer[5]=encodedBytes[1];
+    for (int i=0;i<packetSize;i++){
+        outputToServer[i+6]=_s->at(i);
+    }
 
 
 
 
+
+    msgIsReady=true;
+}

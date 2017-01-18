@@ -22,8 +22,8 @@ int main (int argc, char *argv[]) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
-	BidiMessegeEncoderDecoder* encdec=new BidiMessegeEncoderDecoder(*_ch);
-	//From here we will see the rest of the ehco client implementation:
+    BidiMessegeEncoderDecoder* encdec=new BidiMessegeEncoderDecoder(*_ch);
+    //From here we will see the rest of the ehco client implementation:
     while (1) {
         const short bufsize = 1024;
         char buf[bufsize];
@@ -32,8 +32,8 @@ int main (int argc, char *argv[]) {
         encdec->encode(buf);
         char* msgToSend=encdec->getEncodedMsg();
         //now need to convert the user input to the format for the server (using encoderDevoder).
-		int len=encdec->getMsgSize();
-       // std::cout << "length:\n" << len <<std::endl;
+        int len=encdec->getMsgSize();
+        // std::cout << "length:\n" << len <<std::endl;
         if (!connectionHandler.sendBytes(msgToSend,len)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
@@ -55,7 +55,11 @@ int main (int argc, char *argv[]) {
             break;
         }
         short opc=(encdec->bytesToShort(opcodeArr));
-        cout<<"opcode from server:"<<opc<<endl;
+        if(opc == 4)        cout<<endl<<"ACK 0"<<endl;
+        else if(opc == 5)        cout<<endl<<"Error "<<endl;
+        else if(opc == 9)       cout<<endl<<"BCAST 0 filename"<<endl;
+        else
+            cout<<endl<<"opcode from server: "<<opc<<endl;
         //need to handle BCAST, DATA, DISC, ACK.
         encdec->decode(opc);
 
