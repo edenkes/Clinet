@@ -38,13 +38,14 @@ int main (int argc, char *argv[]) {
     boost::thread th1(boost::bind(&keyboardInput::run,&keyboard));
     boost::thread th2(boost::bind(&serverInput::run,&serverListener));
 
-    cout<<"established 2 threads"<<endl;
     th1.join();
     th2.join();
 
     cout<<"Client is closed"<<endl;
     return 0;
 }
+
+
 
 
 

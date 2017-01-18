@@ -10,7 +10,7 @@ _ch(ch), _encdec(encdec){}
 
 
 void serverInput::run(){
-    cout<<"started serverListener"<<endl;
+//    cout<<"started serverListener"<<endl;
     while (1) {
         if (!_ch->getBytes(opcodeArr, 2)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
@@ -21,6 +21,14 @@ void serverInput::run(){
         //need to handle BCAST, DATA, DISC, ACK.
         _encdec->decode(opc);
         _encdec->proccess(opc);
+        if (_encdec->shouldTerminate()) {
+            break;
+        }
     }
+
+         cout<<"server input - closing connection"<<endl;
+        _ch->close();
+        cout<<"connection terminated"<<endl;
+
 
 }

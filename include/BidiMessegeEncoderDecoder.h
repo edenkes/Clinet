@@ -9,21 +9,24 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <cstring> // for std::strlen
+#include <cstddef> // for std::size_t -> is a typedef on an unsinged int
 
 using namespace std;
 class BidiMessegeEncoderDecoder {
 private:
-    char* outputToUser;
     char* outputToServer;
     vector<char> dataFromUser;
     vector<char> dataFromServer;
-    int output_data_length;
+    size_t outputDatalength;
+    int totalNumberOfBlocksToSend;
+    int blockesSent;
+    char* oData;
+
     int fromServerDataLength;
-    int fromUserDatalength;
     int messegeSize;
     string filenameFromUser;
     string fileNameFromServer;
-    //    ofstream _outputStream;
     bool msgIsReady;
     short opcode;
     char* opcodeInBytes;
@@ -34,11 +37,14 @@ private:
     bool iswaitingForDir;
     bool iswaitingForAck;
     short typeOfLastPacket;
-//    vector data;
     string fileName;
     ofstream outputFile;
     bool iswaitingForDisc;
     bool isItFirstPacket;
+    bool shouldterminate=false;
+    bool keyboardTerminate=false;
+    short packetSize;
+    ifstream inFile;
 
     //Const
 
@@ -52,6 +58,7 @@ public:
     char* getEncodedMsg();
     void createMsgWithZero (short opcode, int fileSize ,char* msg);
     void createSmallMsg (short opcode);
+    void createACK (short block);
     int getMsgSize();
     void decode(char* bytesArr);
     void decode(short msgOpcode);
@@ -61,14 +68,18 @@ public:
     void uptadeLastSentPacket(short opcodeSent);
     void setOpCode();
     void setBytesOpcode(short num);
-    void initDecode();
+    void initEncoder();
     void proccess(short currentOpcode);
     short valueOfTwoCells(char* bytesArr, int first, int second);
     short getShort();
     short bytesToShort(char* bytesArr);
     void shortToBytes(short num, char* bytesArr);
-    char* concat(std::vector<char*> &arrays);
-    void createDataPacket (short blockNum, short packetSize, string* _s);
+    void createDataPacket (short blockNum, short packetSize);
+    bool shouldTerminate ();
+    bool keyboardShouldTerminate();
+    short numberOfBlocksSent;
+    short recievedCounter;
+    short ackBlock;
 
 
 

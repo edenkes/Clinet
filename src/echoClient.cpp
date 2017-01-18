@@ -58,6 +58,7 @@ int main (int argc, char *argv[]) {
         cout<<"opcode from server:"<<opc<<endl;
         //need to handle BCAST, DATA, DISC, ACK.
         encdec->decode(opc);
+        encdec->proccess(opc);
 
 
         //len=answer.length();
@@ -70,10 +71,13 @@ int main (int argc, char *argv[]) {
 //            std::cout << "Exiting...\n" << std::endl;
 //            break;
 //        }
+        if (encdec->shouldTerminate())
+            break;
 
     }
     return 0;
 
 }
- */
+*/
+
 

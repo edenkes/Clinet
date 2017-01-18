@@ -8,7 +8,7 @@ keyboardInput::keyboardInput(ConnectionHandler *connectionHandler, BidiMessegeEn
         _ch(connectionHandler), _encdec(encdec) {}
 
 void keyboardInput::run() {
-    cout<<"started user input"<<endl;
+//    cout<<"started user input"<<endl;
     while (1) {
         char buf[bufsize];
         std::cout << "waiting for user input\n" << std::endl;
@@ -21,6 +21,10 @@ void keyboardInput::run() {
         // std::cout << "length:\n" << len <<std::endl;
         if (!_ch->sendBytes(msgToSend, len)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
+            break;
+
+        }
+        if (_encdec->keyboardShouldTerminate()){
             break;
         }
     }
