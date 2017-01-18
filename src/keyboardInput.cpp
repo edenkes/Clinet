@@ -11,7 +11,7 @@ void keyboardInput::run() {
 //    cout<<"started user input"<<endl;
     while (1) {
         char buf[bufsize];
-        std::cout << "waiting for user input\n" << std::endl;
+        //std::cout << "waiting for user input\n" << std::endl;
         std::cin.getline(buf, bufsize);
         _encdec->encode(buf);
         char *msgToSend = _encdec->getEncodedMsg();

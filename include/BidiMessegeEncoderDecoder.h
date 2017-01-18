@@ -27,7 +27,7 @@ private:
     int messegeSize;
     string filenameFromUser;
     string fileNameFromServer;
-    bool msgIsReady;
+    bool serverMsgIsReady;
     short opcode;
     char* opcodeInBytes;
     ConnectionHandler* _chandler;
@@ -38,6 +38,7 @@ private:
     bool iswaitingForAck;
     short typeOfLastPacket;
     string fileName;
+    string recSendFilename;
     ofstream outputFile;
     bool iswaitingForDisc;
     bool isItFirstPacket;
@@ -45,6 +46,9 @@ private:
     bool keyboardTerminate=false;
     short packetSize;
     ifstream inFile;
+    short numberOfBlocksSent;
+    short recievedCounter;
+    short ackBlock;
 
     //Const
 
@@ -77,9 +81,7 @@ public:
     void createDataPacket (short blockNum, short packetSize);
     bool shouldTerminate ();
     bool keyboardShouldTerminate();
-    short numberOfBlocksSent;
-    short recievedCounter;
-    short ackBlock;
+    bool serverMessegeIsReady();
 
 
 

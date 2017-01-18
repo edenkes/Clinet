@@ -17,18 +17,30 @@ void serverInput::run(){
             break;
         }
         short opc = (_encdec->bytesToShort(opcodeArr));
-        cout << "opcode from server:" << opc << endl;
+        //cout << "opcode from server:" << opc << endl;
         //need to handle BCAST, DATA, DISC, ACK.
         _encdec->decode(opc);
         _encdec->proccess(opc);
         if (_encdec->shouldTerminate()) {
             break;
         }
+        if (_encdec->serverMessegeIsReady()) {
+            char *msgToSend = _encdec->getEncodedMsg();
+            // TODO: after sending the msg need to delete the msgToSend;
+            //now need to convert the user input to the format for the server (using encoderDevoder).
+            int len = _encdec->getMsgSize();
+            // std::cout << "length:\n" << len <<std::endl;
+            if (!_ch->sendBytes(msgToSend, len)) {
+                std::cout << "Disconnected. Exiting...\n" << std::endl;
+                break;
+
+            }
+        }
     }
 
-         cout<<"server input - closing connection"<<endl;
+        // cout<<"server input - closing connection"<<endl;
         _ch->close();
-        cout<<"connection terminated"<<endl;
+      //  cout<<"connection terminated"<<endl;
 
 
 }
