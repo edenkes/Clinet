@@ -27,7 +27,7 @@ private:
     bool msgIsReady;
     short opcode;
     char* opcodeInBytes;
-    ConnectionHandler& _chandler;
+    ConnectionHandler* _chandler;
     bool isSendingData;
     bool isRecevingData;
     bool iswaitingForData;
@@ -44,7 +44,7 @@ private:
 
 
 public:
-    BidiMessegeEncoderDecoder(ConnectionHandler& ch);
+    BidiMessegeEncoderDecoder(ConnectionHandler* ch);
     virtual ~BidiMessegeEncoderDecoder();
     vector<char>* decodeNextByte(char nextChar); //maybe need other thing then char.
     void pushCharFromServer(char nextChar);
