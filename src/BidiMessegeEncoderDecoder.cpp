@@ -6,7 +6,9 @@
 
 
 
-BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _chandler(ch),blockesSent(0), messegeSize(0), recievedCounter(1) {
+BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _chandler(ch),blockesSent(0),
+                                                                             messegeSize(0), recievedCounter(0),
+                                                                             numberOfBlocksSent(0), ackBlock(0){
 
 //    cout<<"BidiEncoderDecoder constructor"<< std::endl;
     opcodeInBytes=new char[2];
@@ -26,9 +28,7 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _ch
 
 
     serverMsgIsReady=false;
-    numberOfBlocksSent=0;
-    recievedCounter=0;
-    ackBlock=0;
+
     totalNumberOfBlocksToSend=0;
     continueSend=false;
 
@@ -38,7 +38,9 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _ch
 
 
 //Copy Constructor
-BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(const BidiMessegeEncoderDecoder& source):  _chandler(source._chandler){
+BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(const BidiMessegeEncoderDecoder& source):  _chandler(source._chandler),blockesSent(0),
+                                                                                                messegeSize(0),
+                                                                                                numberOfBlocksSent(0), recievedCounter(0), ackBlock(0){
     opcodeInBytes=new char[2];
     dataFromServer.reserve(1024);
     dataFromUser.reserve(1024);
@@ -279,7 +281,7 @@ void BidiMessegeEncoderDecoder::decodeDATA(){
         char singleByte[1];
         packetSize = getShort();
         short blockNum = getShort();
-        cout << "recieved data packet. size:" << packetSize << " block:" << blockNum << endl;
+       // cout << "recieved data packet. size:" << packetSize << " block:" << blockNum << endl;
 
             while ((counter < packetSize)  ) {
                 _chandler->getBytes(singleByte, 1);
@@ -382,7 +384,7 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
             }
             else{
                 recievedCounter++;
-                cout<<"waiting for another dir msg"<<endl;
+              //  cout<<"waiting for another dir msg"<<endl;
             }
 
         }
@@ -391,7 +393,7 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
                 recievedCounter=1;
                 isItFirstPacket = false;
                 outputFile.open(recSendFilename);
-                cout<<"recieving new file in the folder, name:"<<recSendFilename<<endl;
+               // cout<<"recieving new file in the folder, name:"<<recSendFilename<<endl;
 
             }
 
@@ -400,7 +402,7 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
                 s+=(char)dataFromServer[i];
                 outputFile << dataFromServer[i];
             }
-            cout<<"file is:"<<s<<endl;
+           // cout<<"file is:"<<s<<endl;
             createACK(recievedCounter);
             recievedCounter++;
             if(packetSize < 512){

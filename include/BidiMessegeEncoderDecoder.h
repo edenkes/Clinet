@@ -89,45 +89,7 @@ public:
     bool shouldTerminate ();
     bool keyboardShouldTerminate();
     bool serverMessegeIsReady();
-
-
-
-
-    /*
- * using namespace std;
-class EncodeDecode {
-private:
-    short _port;
-    string _addr;
-    ConnectionHandler& _chandler;
-    vector<char> recievedData;
-    char* _outBytes;
-    string filename;
-    ofstream _outf;
-    bool isInialized=false;
-    void logReadWriteDel(short opCode,string& name);
-    void dirqDisc(short opCode);
-public:
-    short bytesToShort(char* bytesArr);
-    void shortToBytes(short num, char* bytesArr);
-    EncodeDecode(short port,string host,ConnectionHandler& chandler);
-    virtual ~EncodeDecode();
-    short getOpcode(string& opcode);
-    void inputFromKeyboard(short opCode,string& name);
-    void getMessage();
-    int _outBytesSize;
-    char* getOutBytes(){return _outBytes;}
-    void resetOutBytes(){_outBytes=0;}
-    int sendReqType;//1 for RRQ, 2 for WRQ , 6 for DIRQ
-
-    void outputProceedReadOpcode(short opcode);
-};
-
-
- */
-
     void crateFile();
-
 
 };
 
