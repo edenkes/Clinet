@@ -49,6 +49,7 @@ private:
     short numberOfBlocksSent;
     short recievedCounter;
     short ackBlock;
+    short dataBlockNum;
 
     //Const
 

@@ -16,7 +16,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(SOURCE_FILES
     include/connectionHandler.h
     src/connectionHandler.cpp
-        src/BidiMessegeEncoderDecoder.cpp include/BidiMessegeEncoderDecoder.h src/encoderDecoderTester.cpp src/keyboardInput.cpp include/keyboardInput.h src/serverInput.cpp include/serverInput.h src/bidiClient.cpp)
+        src/BidiMessegeEncoderDecoder.cpp include/BidiMessegeEncoderDecoder.h src/keyboardInput.cpp include/keyboardInput.h src/serverInput.cpp include/serverInput.h src/bidiClient.cpp)
 
 add_executable(Client ${SOURCE_FILES})
 if(Boost_FOUND)
