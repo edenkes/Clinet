@@ -33,7 +33,7 @@ private:
     ConnectionHandler* _chandler;
     bool isSendingData;
     bool isRecevingData;
-    bool iswaitingForData;
+    bool continueSend;
     bool iswaitingForDir;
     bool iswaitingForAck;
     short typeOfLastPacket;

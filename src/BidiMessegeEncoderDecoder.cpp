@@ -6,7 +6,7 @@
 
 
 
-BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _chandler(ch) {
+BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _chandler(ch),blockesSent(0), messegeSize(0), recievedCounter(1) {
 
 //    cout<<"BidiEncoderDecoder constructor"<< std::endl;
     opcodeInBytes=new char[2];
@@ -15,7 +15,36 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _ch
     fromServerDataLength=0;
     isSendingData=false;
     isRecevingData=false;
-    iswaitingForData=false;
+    iswaitingForDir=false;
+    iswaitingForAck=false;
+    iswaitingForDisc = false;
+    isItFirstPacket = true;
+    keyboardTerminate=false;
+    typeOfLastPacket=-1; //put false value
+    fileName = "";
+    shouldterminate=false;
+
+
+    serverMsgIsReady=false;
+    numberOfBlocksSent=0;
+    recievedCounter=0;
+    ackBlock=0;
+    totalNumberOfBlocksToSend=0;
+    continueSend=false;
+
+
+
+}
+
+
+//Copy Constructor
+BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(const BidiMessegeEncoderDecoder& source):  _chandler(source._chandler){
+    opcodeInBytes=new char[2];
+    dataFromServer.reserve(1024);
+    dataFromUser.reserve(1024);
+    fromServerDataLength=0;
+    isSendingData=false;
+    isRecevingData=false;
     iswaitingForDir=false;
     iswaitingForAck=false;
     iswaitingForDisc = false;
@@ -25,17 +54,22 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _ch
     fileName = "";
     shouldterminate=false;
     recievedCounter=1;
-
-}
-
-
-//Copy Constructor
-BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(const BidiMessegeEncoderDecoder& source){
-
+    blockesSent=0;
+    messegeSize=0;
+    serverMsgIsReady=false;
+    numberOfBlocksSent=0;
+    recievedCounter=0;
+    ackBlock=0;
+    continueSend=false;
 }
 
 //Overloaded Assignment
-BidiMessegeEncoderDecoder& BidiMessegeEncoderDecoder::operator=(const BidiMessegeEncoderDecoder& source){
+BidiMessegeEncoderDecoder& BidiMessegeEncoderDecoder::operator=(const BidiMessegeEncoderDecoder& source) {
+    if(this == &source)
+        return *this;
+
+
+    return *this;
 
 }
 
@@ -362,7 +396,7 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
             }
 
             string s="";
-            for (int i = 0; i < packetSize; ++i) {
+            for (int i = 0; i < packetSize; i++) {
                 s+=(char)dataFromServer[i];
                 outputFile << dataFromServer[i];
             }
@@ -387,7 +421,6 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
         if(iswaitingForDisc){
             shouldterminate=true;
         }
-//        ifstream fileBuffer;
         else  if(isSendingData) {
             /*
              *  size_t outputDatalength;
@@ -398,49 +431,57 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
 
             if (isItFirstPacket) {
                 isItFirstPacket = false;
-                inFile.open(recSendFilename, ios::in | ios::binary | ios::ate);
-                inFile.seekg(0, ios::end); // set the pointer to the end
-                outputDatalength = inFile.tellg(); // get the length of the file
-                cout << "Size of file: " << outputDatalength;
-                totalNumberOfBlocksToSend = (outputDatalength / 512) + 1;
-                blockesSent = 0;
+                std::ifstream checkFile(recSendFilename);
+                if (checkFile.good()){
+                    inFile.open(recSendFilename, ios::in | ios::binary | ios::ate);
+                    inFile.seekg(0, ios::end); // set the pointer to the end
+                    outputDatalength = inFile.tellg(); // get the length of the file
+                    cout << "Size of file: " << outputDatalength;
+                    totalNumberOfBlocksToSend = (outputDatalength / 512) + 1;
+                    blockesSent = 0;
 
-                inFile.seekg(0, ios::beg); // set the pointer to the beginning
-                oData = new char[outputDatalength];
-                inFile.read(oData, outputDatalength); //now all the file is in the oData.
-                inFile.close();
-            }
-
-            int bytesLeft = outputDatalength - (ackBlock * 512);
-            int thisDataSize;
-            if (bytesLeft > 512) {
-            outputToServer = new char[518];
-            thisDataSize = 512;
-            }
-            else {
-                outputToServer = new char[bytesLeft + 6];
-                thisDataSize=bytesLeft;
-            }
-            //set size of output a array;
-            size_t startIndex=512*blockesSent;
-            int counter=6;
+                    inFile.seekg(0, ios::beg); // set the pointer to the beginning
+                    oData = new char[outputDatalength];
+                    inFile.read(oData, outputDatalength); //now all the file is in the oData.
+                    inFile.close();
+                    continueSend=true;
+                }
+                else {
+                    createSmallMsg(11);
+                    continueSend=false;
+                    serverMsgIsReady=true;
+                }
 
 
-            for ( size_t i = startIndex; i < startIndex+thisDataSize; i++ )
-            {
-                outputToServer[counter]=oData[i];
             }
-            createDataPacket(blockesSent+1,thisDataSize);
-            if (thisDataSize<512){
-                isSendingData=false;
-                blockesSent=0;
-                //TODO:need to delete oData.
-            }
-            else{
-                blockesSent++;
-            }
+            if (continueSend) {
+                int bytesLeft = outputDatalength - (ackBlock * 512);
+                int thisDataSize;
+                if (bytesLeft > 512) {
+                    outputToServer = new char[518];
+                    thisDataSize = 512;
+                } else {
+                    outputToServer = new char[bytesLeft + 6];
+                    thisDataSize = bytesLeft;
+                }
+                //set size of output a array;
+                size_t startIndex = 512 * blockesSent;
+                int counter = 6;
 
 
+                for (size_t i = startIndex; i < startIndex + thisDataSize; i++) {
+                    outputToServer[counter] = oData[i];
+                }
+                createDataPacket(blockesSent + 1, thisDataSize);
+                if (thisDataSize < 512) {
+                    isSendingData = false;
+                    blockesSent = 0;
+                    //TODO:need to delete oData.
+                } else {
+                    blockesSent++;
+                }
+
+            }
 
         }
 
