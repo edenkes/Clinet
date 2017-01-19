@@ -55,6 +55,13 @@ private:
 
 public:
     BidiMessegeEncoderDecoder(ConnectionHandler* ch);
+    //Copy Constructor
+    BidiMessegeEncoderDecoder(const BidiMessegeEncoderDecoder& source);
+
+    //Overloaded Assignment
+    BidiMessegeEncoderDecoder& operator=(const BidiMessegeEncoderDecoder& source);
+
+    //Desstructor
     virtual ~BidiMessegeEncoderDecoder();
     vector<char>* decodeNextByte(char nextChar); //maybe need other thing then char.
     void pushCharFromServer(char nextChar);

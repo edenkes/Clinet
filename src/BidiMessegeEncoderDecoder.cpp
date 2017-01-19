@@ -22,16 +22,27 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch): _ch
     isItFirstPacket = true;
     keyboardTerminate=false;
     typeOfLastPacket=-1; //put false value
-//    data = new vector;
     fileName = "";
     shouldterminate=false;
     recievedCounter=1;
 
 }
 
+
+//Copy Constructor
+BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(const BidiMessegeEncoderDecoder& source){
+
+}
+
+//Overloaded Assignment
+BidiMessegeEncoderDecoder& BidiMessegeEncoderDecoder::operator=(const BidiMessegeEncoderDecoder& source){
+
+}
+
 BidiMessegeEncoderDecoder::~BidiMessegeEncoderDecoder() {
 
 }
+
 
 
 vector<char>* BidiMessegeEncoderDecoder::decodeNextByte(char nextChar) {
@@ -379,13 +390,12 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
 //        ifstream fileBuffer;
         else  if(isSendingData) {
             /*
-             *
-             *
              *  size_t outputDatalength;
                 int totalNumberOfBlocksToSend;
                 int blockesSent;
                 char* oData;
              */
+
             if (isItFirstPacket) {
                 isItFirstPacket = false;
                 inFile.open(recSendFilename, ios::in | ios::binary | ios::ate);
@@ -398,10 +408,8 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
                 inFile.seekg(0, ios::beg); // set the pointer to the beginning
                 oData = new char[outputDatalength];
                 inFile.read(oData, outputDatalength); //now all the file is in the oData.
+                inFile.close();
             }
-
-            //TODO::need to implement
-
 
             int bytesLeft = outputDatalength - (ackBlock * 512);
             int thisDataSize;
@@ -417,7 +425,7 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
             size_t startIndex=512*blockesSent;
             int counter=6;
 
-            //print data
+
             for ( size_t i = startIndex; i < startIndex+thisDataSize; i++ )
             {
                 outputToServer[counter]=oData[i];
@@ -426,6 +434,7 @@ void BidiMessegeEncoderDecoder::proccess(short currentOpcode){
             if (thisDataSize<512){
                 isSendingData=false;
                 blockesSent=0;
+                //TODO:need to delete oData.
             }
             else{
                 blockesSent++;
@@ -509,3 +518,57 @@ bool BidiMessegeEncoderDecoder::serverMessegeIsReady() {
     return (serverMsgIsReady);
 }
 
+/*
+char* readFileBytes(const char *name)
+{
+    char* ret;
+    string s="config1.txt";
+    char* c=new char[11];
+    for (int i=0;i<11;i++){
+        c[i]=s.at(i);
+    }
+
+    ifstream fl(c);
+
+    if (fl.is_open())
+        cout << "opened" << endl;
+    else
+        cout<<"not opened"<<endl;
+
+        fl.seekg( 0, ios::end );
+        size_t len = fl.tellg();
+        ret = new char[len];
+        fl.seekg(0, ios::beg);
+        fl.read(ret, len);
+        fl.close();
+    return ret;
+}
+
+void writefile(){
+
+    ofstream stream;
+    char charArray[] = "Some stuff in a char array.";
+    string s ="secondURL.txt";
+    stream.open(s);
+    if( !stream )
+        cout << "Opening file failed" << endl;
+    // use operator<< for clarity
+    stream << charArray << endl;
+    // test if write was succesful - not *really* necessary
+    if( !stream )
+        cout << "Write failed" << endl;
+    stream.close();
+
+}
+
+void secondfile(){
+    ofstream ofs;
+    ofs.open( "./secondURL.txt");
+    char charArray[] = "Some stuff in a char array.";
+
+    ofs.write( (char*)charArray, 13 );
+    ofs.close();
+
+}
+
+*/

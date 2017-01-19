@@ -11,54 +11,20 @@
 #include "../include/keyboardInput.h"
 #include "../include/serverInput.h"
 #include <fstream>
+#include <string>
+#include <limits.h>
+#include <unistd.h>
+using std::ofstream;
+
 
 using boost::thread;
 using namespace std;
 
 
+
+
 int main (int argc, char *argv[]) {
 
-
-
-    std::ofstream outfile ("new.txt",std::ofstream::binary);
-/*
-    // get size of file
-
-
-    // allocate memory for file content
-
-
-
-    char c[6];
-
-    for (int i=0;i<6;i++){
-        c[i]='a';
-    }
-
-    // write to outfile
-    outfile.write (c,5);
-
-    // release dynamically-allocated memory
-
-
-    outfile.close();
-
-//
-//    ofstream outputFile;
-//    outputFile.open("music.txt");
-//            cout<<"recieving new file in the folder, name:"<<"music"<<endl;
-//
-//
-//
-//        string s="";
-//        for (int i = 0; i < 25; ++i) {
-//            s+="a";
-//            outputFile << "a";
-//        }
-//
-//            outputFile.close();
-
-*/
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
         return -1;
@@ -86,8 +52,10 @@ int main (int argc, char *argv[]) {
 
     cout<<"Client is closed"<<endl;
 
+
     return 0;
 }
+
 
 
 
