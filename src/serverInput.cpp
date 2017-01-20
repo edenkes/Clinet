@@ -35,6 +35,7 @@ void serverInput::run(){
                 break;
 
             }
+            _encdec->initEncoder();
         }
     }
 

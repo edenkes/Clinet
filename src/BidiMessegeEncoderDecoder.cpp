@@ -14,7 +14,7 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(ConnectionHandler* ch):
         isItFirstPacket(true), keyboardTerminate(false), fileName(""),
         shouldterminate(false),  serverMsgIsReady(false),  continueSend(false){
 
-    opcodeInBytes=new char[2];
+    opcodeInBytes[2];
     dataFromServer.reserve(1024);
     dataFromUser.reserve(1024);
 }
@@ -25,7 +25,7 @@ BidiMessegeEncoderDecoder::BidiMessegeEncoderDecoder(const BidiMessegeEncoderDec
                                                                                                 messegeSize(0), recievedCounter(1),
                                                                                                 numberOfBlocksSent(0), ackBlock(0), dataBlockNum(0),
                                                                                                 totalNumberOfBlocksToSend(0),  fromServerDataLength(0),  typeOfLastPacket(-1){
-    opcodeInBytes=new char[2];
+    opcodeInBytes[2];
     dataFromServer.reserve(1024);
     dataFromUser.reserve(1024);
     isSendingData=false;
@@ -67,10 +67,11 @@ BidiMessegeEncoderDecoder& BidiMessegeEncoderDecoder::operator=(const BidiMesseg
     */
 BidiMessegeEncoderDecoder::~BidiMessegeEncoderDecoder() {
     //delete(outputToServer);
+    //delete[] outputToServer;
     dataFromUser.clear();
     dataFromServer.clear();
     //delete(oData);
-    //delete (opcodeInBytes);
+    //delete[] opcodeInBytes;
     outputFile.clear();
 
     inFile.clear();
@@ -220,6 +221,7 @@ void BidiMessegeEncoderDecoder::createMsgWithZero (short opcode, int fileSize ,c
 }
 //called only by keyboard
 void BidiMessegeEncoderDecoder::createSmallMsg (short opcode){
+
     messegeSize=2;
     outputToServer=new char[2];
     shortToBytes(opcode,outputToServer);
@@ -344,6 +346,11 @@ void BidiMessegeEncoderDecoder::initEncoder() {
     outputToServer=0;
     serverMsgIsReady=false;
     opcode=0;
+//    for(unsigned int i=0; i<messegeSize; i++){
+//        cout<<"del1 ";
+//        outputToServer[i]=0;
+//    }
+    delete[] outputToServer;
     dataFromUser.clear();
     messegeSize=0;
 }

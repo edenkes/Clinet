@@ -27,6 +27,7 @@ void keyboardInput::run() {
         if (_encdec->keyboardShouldTerminate()){
             break;
         }
+        _encdec->initEncoder();
     }
 }
 
