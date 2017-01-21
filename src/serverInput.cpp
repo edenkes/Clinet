@@ -35,6 +35,8 @@ void serverInput::run(){
                 break;
 
             }
+            if (len>0)
+                delete[] msgToSend;
             _encdec->initEncoder();
         }
     }

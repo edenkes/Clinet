@@ -12,8 +12,6 @@
 #include "../include/serverInput.h"
 #include <fstream>
 #include <string>
-#include <limits.h>
-#include <unistd.h>
 using std::ofstream;
 
 

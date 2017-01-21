@@ -25,8 +25,12 @@ void keyboardInput::run() {
 
         }
         if (_encdec->keyboardShouldTerminate()){
+
             break;
         }
+        if (len>0)
+            delete[] msgToSend;
+
         _encdec->initEncoder();
     }
 }

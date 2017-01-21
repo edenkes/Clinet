@@ -25,10 +25,7 @@ private:
 
     int fromServerDataLength;
     int messegeSize;
-    string filenameFromUser;
-    string fileNameFromServer;
     bool serverMsgIsReady;
-    short opcode;
     char* opcodeInBytes;
     ConnectionHandler* _chandler;
     bool isSendingData;
@@ -37,13 +34,14 @@ private:
     bool iswaitingForDir;
     bool iswaitingForAck;
     short typeOfLastPacket;
-    string fileName;
-    string recSendFilename;
+    string fileName="";
+    string recSendFilename="";
     ofstream outputFile;
+    //
     bool iswaitingForDisc;
     bool isItFirstPacket;
-    bool shouldterminate=false;
-    bool keyboardTerminate=false;
+    bool shouldterminate;
+    bool keyboardTerminate;
     short packetSize;
     ifstream inFile;
     short numberOfBlocksSent;
@@ -77,12 +75,8 @@ public:
     void decodeDATA();
     void decodeERROR();
     void decodeBCAST();
-    void uptadeLastSentPacket(short opcodeSent);
-    void setOpCode();
-    void setBytesOpcode(short num);
     void initEncoder();
     void proccess(short currentOpcode);
-    short valueOfTwoCells(char* bytesArr, int first, int second);
     short getShort();
     short bytesToShort(char* bytesArr);
     void shortToBytes(short num, char* bytesArr);
@@ -90,7 +84,6 @@ public:
     bool shouldTerminate ();
     bool keyboardShouldTerminate();
     bool serverMessegeIsReady();
-    void crateFile();
 
 };
 
